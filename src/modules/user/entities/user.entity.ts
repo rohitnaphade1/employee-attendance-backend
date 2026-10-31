@@ -1,12 +1,6 @@
-
-import { Employee } from 'src/modules/employees/entities/employee.entity';
+import { Employee } from '../../employees/entities/employee.entity';
 import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
+  Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('users')
@@ -17,16 +11,13 @@ export class User {
   @Column({ type: 'varchar', length: 150, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, select: false })
   password: string;
 
   @CreateDateColumn({ type: 'datetime' })
   createdAt: Date;
 
-  @ManyToOne(() => Employee)
-  @JoinColumn({
-    name: 'employeeId',
-    referencedColumnName: 'employeeId',
-  })
+  @ManyToOne(() => Employee, (employee) => employee.users, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'employeeId', referencedColumnName: 'employeeId' })
   employee: Employee;
 }

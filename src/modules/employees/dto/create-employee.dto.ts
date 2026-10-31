@@ -1,10 +1,13 @@
+import { IsDateString, IsEmail, IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
+
 export class CreateEmployeeDto {
-  employeeCode: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string | null;
-  department?: string | null;
-  designation?: string | null;
-  joiningDate: string;
+  @IsString() @MaxLength(64) employeeCode: string;
+  @IsString() @MaxLength(100) firstName: string;
+  @IsString() @MaxLength(100) lastName: string;
+  @IsEmail() @MaxLength(150) email: string;
+  @IsOptional() @IsString() @MaxLength(20) phone?: string;
+  @IsOptional() @IsString() @MaxLength(100) department?: string;
+  @IsOptional() @IsString() @MaxLength(100) designation?: string;
+  @IsDateString() joiningDate: string;
+  @IsOptional() @IsIn(['ACTIVE', 'INACTIVE']) status?: 'ACTIVE' | 'INACTIVE';
 }

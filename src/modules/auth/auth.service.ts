@@ -1,4 +1,3 @@
-
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,26 +18,36 @@ export class AuthService {
     const user = await this.userRepository.findOne({
       where: { email },
       relations: { employee: true },
+      select: {
+        userId: true,
+        email: true,
+        password: true,
+        createdAt: true,
+        employee: {
+          employeeId: true,
+          employeeCode: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          department: true,
+          designation: true,
+          joiningDate: true,
+          status: true,
+        },
+      },
     });
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
+    if (!user) throw new UnauthorizedException('Invalid email or password');
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) throw new UnauthorizedException('Invalid email or password');
+
+    if (user.employee.status !== 'ACTIVE') {
+      throw new UnauthorizedException('Employee account is inactive');
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.password,
-    );
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    const { password: _, ...safeUser } = user;
-
-    return {
-      message: 'Login successful',
-      user: safeUser,
-    };
+    const { password: _password, ...safeUser } = user;
+    return { message: 'Login successful', user: safeUser };
   }
 }
